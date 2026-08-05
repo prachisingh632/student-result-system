@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Student Result System</title>
+<style>
+  :root {
+    --purple-dark: #F504A5;
+    --purple-header: #01837A;
+    --purple-light: #F3EEFB;
+    --purple-accent: #B809F8;
+    --white: #FFFFFF;
+    --green: #1E8E3E;
+    --red: #D93025;
+    --text-dark: #2B2B2B;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--purple-light);
+    color: var(--text-dark);
+    display: flex;
+    justify-content: center;
+  }
+
+  .app {
+    width: 420px;
+    max-width: 100%;
+    min-height: 100vh;
+    background: var(--purple-light);
+  }
+
+  /* Header */
+  .header {
+    background: var(--purple-header);
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .header h1 {
+    color: var(--white);
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0;
+  }
+
+  /* Form Card */
+  .form-card {
+    background: var(--white);
+    border: 1px solid #DDD;
+    margin: 15px;
+    padding: 15px;
+    border-radius: 4px;
+  }
+
+  .form-row { margin-bottom: 10px; }
+  .form-row label {
+    display: block;
+    font-size: 10pt;
+    margin-bottom: 4px;
+  }
+  .form-row input {
+    width: 100%;
+    padding: 6px 8px;
+    font-size: 10pt;
+    border: 1px solid #999;
+    border-radius: 2px;
+    font-family: inherit;
+  }
+
+  .btn-primary {
+    width: 100%;
+    background: var(--purple-accent);
+    color: var(--white);
+    border: none;
+    padding: 10px;
+    font-size: 10pt;
+    font-weight: bold;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .btn-primary:hover { background: var(--purple-dark); }
+
+  /* Result list heading */
+  .section-title {
+    text-align: center;
+    color: var(--purple-dark);
+    font-size: 14px;
+    font-weight: bold;
+    margin: 0 0 8px 0;
+  }
+
+  /* Table */
+  .table-frame {
+    background: var(--white);
+    margin: 0 15px;
+    border-radius: 4px;
+    overflow: hidden;
+    max-height: 230px;
+    overflow-y: auto;
+    border: 1px solid #DDD;
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+  thead th {
+    background: var(--purple-accent);
+    color: var(--white);
+    font-weight: bold;
+    padding: 7px 4px;
+    position: sticky;
+    top: 0;
+  }
+  tbody td {
+    text-align: center;
+    padding: 7px 4px;
+    border-bottom: 1px solid #EEE;
+  }
+  tbody tr:hover { background: #E4D9F7; cursor: pointer; }
+  .pass { color: var(--green); font-weight: 600; }
+  .fail { color: var(--red); font-weight: 600; }
+
+  .empty-row td {
+    color: #999;
+    font-style: italic;
+    padding: 16px;
+  }
+
+  /* Delete button */
+  .delete-wrap { text-align: center; margin: 8px 0; }
+  .btn-secondary {
+    background: #EDEDED;
+    color: var(--text-dark);
+    border: none;
+    padding: 7px 14px;
+    font-size: 9pt;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .btn-secondary:hover { background: #E0E0E0; }
+
+  /* Summary */
+  .summary-card {
+    background: var(--purple-light);
+    border: 1px solid #DDD;
+    margin: 0 15px 15px 15px;
+    border-radius: 4px;
+    text-align: center;
+    padding: 10px 0;
+  }
+  .summary-card div { font-size: 10pt; font-weight: bold; margin: 2px 0; }
+  .total { color: var(--text-dark); }
+  .passed { color: var(--green); }
+  .failed { color: var(--red); }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="header">
+    <h1>🎓 Student Result System</h1>
+  </div>
+
+  <div class="form-card">
+    <div class="form-row">
+      <label for="name">Enter Name:</label>
+      <input type="text" id="name" />
+    </div>
+    <div class="form-row">
+      <label for="roll">Enter Roll No:</label>
+      <input type="text" id="roll" />
+    </div>
+    <div class="form-row">
+      <label for="cls">Class:</label>
+      <input type="text" id="cls" />
+    </div>
+    <div class="form-row">
+      <label for="marks">Marks:</label>
+      <input type="number" id="marks" />
+    </div>
+    <button class="btn-primary" onclick="addOrUpdateStudent()">Add / Update</button>
+  </div>
+
+  <p class="section-title">Result List</p>
+
+  <div class="table-frame">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Roll No.</th>
+          <th>Marks</th>
+          <th>Result</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <tr class="empty-row"><td colspan="4">No records yet</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="delete-wrap">
+    <button class="btn-secondary" onclick="deleteSelected()">Delete Selected</button>
+  </div>
+
+  <div class="summary-card">
+    <div class="total" id="totalLabel">Total Students: 0</div>
+    <div class="passed" id="passedLabel">Passed: 0</div>
+    <div class="failed" id="failedLabel">Failed: 0</div>
+  </div>
+</div>
+
+<script>
+  const PASS_MARK = 40;
+  let students = {}; // roll -> {name, cls, marks}
+  let selectedRoll = null;
+
+  function addOrUpdateStudent() {
+    const name = document.getElementById('name').value.trim();
+    const roll = document.getElementById('roll').value.trim();
+    const cls = document.getElementById('cls').value.trim();
+    const marksStr = document.getElementById('marks').value.trim();
+
+    if (!name || !roll || !cls || !marksStr) {
+      alert('Please fill in all fields.');
+      return;
+    }
+    const marks = parseFloat(marksStr);
+    if (isNaN(marks)) {
+      alert('Marks must be a number.');
+      return;
+    }
+
+    students[roll] = { name, cls, marks };
+
+    document.getElementById('name').value = '';
+    document.getElementById('roll').value = '';
+    document.getElementById('cls').value = '';
+    document.getElementById('marks').value = '';
+
+    refreshTable();
+  }
+
+  function selectRow(roll) {
+    selectedRoll = roll;
+    const record = students[roll];
+    if (record) {
+      document.getElementById('name').value = record.name;
+      document.getElementById('roll').value = roll;
+      document.getElementById('cls').value = record.cls;
+      document.getElementById('marks').value = record.marks;
+    }
+    refreshTable();
+  }
+
+  function deleteSelected() {
+    if (!selectedRoll || !(selectedRoll in students)) {
+      alert('Select a row to delete (click on it first).');
+      return;
+    }
+    delete students[selectedRoll];
+    selectedRoll = null;
+    refreshTable();
+  }
+
+  function refreshTable() {
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+
+    const rolls = Object.keys(students).sort();
+    let passed = 0, failed = 0;
+
+    if (rolls.length === 0) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="4">No records yet</td></tr>';
+    }
+
+    rolls.forEach(roll => {
+      const data = students[roll];
+      const isPass = data.marks >= PASS_MARK;
+      if (isPass) passed++; else failed++;
+
+      const tr = document.createElement('tr');
+      if (roll === selectedRoll) tr.style.background = '#E4D9F7';
+      tr.onclick = () => selectRow(roll);
+
+      tr.innerHTML = `
+        <td>${escapeHtml(data.name)}</td>
+        <td>${escapeHtml(roll)}</td>
+        <td>${data.marks}</td>
+        <td class="${isPass ? 'pass' : 'fail'}">${isPass ? 'Pass' : 'Fail'}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('totalLabel').textContent = `Total Students: ${rolls.length}`;
+    document.getElementById('passedLabel').textContent = `Passed: ${passed}`;
+    document.getElementById('failedLabel').textContent = `Failed: ${failed}`;
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  refreshTable();
+</script>
+
+</body>
+</html>
